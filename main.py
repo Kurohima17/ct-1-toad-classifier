@@ -42,7 +42,7 @@ def predict_image(img_path):
 # Main function
 if __name__ == "__main__":
     # Instantiate local variables
-    img_path = "data/canetoad/6.jpeg"
+    img_path = "data/canetoad/1.jpg"
 
     # Predict image
     prediction = predict_image(img_path)
