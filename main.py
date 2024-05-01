@@ -1,4 +1,5 @@
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0' # Disable OneDNN
 import tensorflow as tf
 
 # Load and preprocess image
@@ -16,6 +17,7 @@ def load_image(img_path):
     image = tf.image.decode_jpeg(image, channels=3) # Decode image
     image = tf.image.resize(image, [img_height, img_width]) # Resize image to 256x256
     image /= 255.0  # normalize to [0,1] range
+    image = tf.expand_dims(image, 0) # Add batch dimension
     return image
 
 # Predict whether image is cane toad or not, extracting confidence level
@@ -30,19 +32,24 @@ def predict_image(img_path):
 
     # Load image
     img = load_image(img_path)
+    print(img.shape)
 
     # Make prediction
-    prediction = model.predict(tf.expand_dims(img, 0))
+    prediction = model.predict(img)
 
     return prediction
 
 # Main function
 if __name__ == "__main__":
     # Instantiate local variables
-    img_path = "data/canetoad/9.jpeg"
+    img_path = "data/canetoad/6.jpeg"
 
     # Predict image
     prediction = predict_image(img_path)
+    
+    # Normalise prediction to 0-1
+    prediction = tf.nn.sigmoid(prediction)
+    print(prediction)
 
     # Print prediction
     if prediction[0][0] > 0.5:
