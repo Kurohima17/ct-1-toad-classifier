@@ -128,11 +128,13 @@ def best_model(train_dataset, test_dataset, num_classes, num_shots):
     # Reset best accuracy and best model
     best_accuracy = 0
     best_model = None
+    best_num_shot = 0
 
     # Find best model based on number of shots
     for num_shot in num_shots:
         model, accuracy = few_shot_learning(train_dataset, test_dataset, num_classes, num_shot)
         if accuracy > best_accuracy:
+            best_num_shot = num_shot
             best_accuracy = accuracy
             best_model = model
 
@@ -146,7 +148,7 @@ def main():
     train_dataset, test_dataset, num_classes = load_dataset(data_dir)
 
     # Perform few-shot learning
-    num_shots = [1, 2, 3, 4, 5, 10]
+    num_shots = [1, 2, 3, 4, 5]
     model = best_model(train_dataset, test_dataset, num_classes, num_shots)
 
     # Save the best model
