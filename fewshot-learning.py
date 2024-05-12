@@ -1,7 +1,8 @@
 import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0' # Disable OneDNN
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0' # Disable OneDNN warning
 import numpy as np
 import tensorflow as tf
+import random
 from tensorflow.keras.applications import Xception
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.models import Model
@@ -14,6 +15,7 @@ from tensorflow.keras.losses import CategoricalCrossentropy
 # Last update: 12 May 2024
 
 # References
+# https://www.borealisai.com/research-blogs/tutorial-2-few-shot-learning-and-meta-learning-i/
 # https://www.tensorflow.org/datasets/api_docs/python/tfds
 # https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/image_dataset_from_directory
 # https://www.tensorflow.org/api_docs/python/tf/keras/layers/GlobalAveragePooling2D
@@ -27,13 +29,15 @@ from tensorflow.keras.losses import CategoricalCrossentropy
 img_height = 256
 img_width = 256
 data_dir = 'data'
+seed = random.randint(0, 1000) # randomise seed
 
-def load_dataset(data_dir, test_split=0.2, image_size=(224, 224), batch_size=32):
+
+def load_dataset(data_dir, test_split=0.2, image_size=(img_height, img_width), batch_size=32):
     train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
         data_dir,
         validation_split=test_split,
         subset="training",
-        seed=123,
+        seed=seed,
         image_size=image_size,
         batch_size=batch_size
     )
@@ -42,7 +46,7 @@ def load_dataset(data_dir, test_split=0.2, image_size=(224, 224), batch_size=32)
         data_dir,
         validation_split=test_split,
         subset="validation",
-        seed=123,
+        seed=seed,
         image_size=image_size,
         batch_size=batch_size
     )
@@ -85,6 +89,7 @@ def few_shot_learning(train_dataset, test_dataset, num_classes, num_shot):
     query_set_images = []
     query_set_labels = []
 
+    # Iterate over each class
     for class_index in range(num_classes):
         class_indices = np.where(labels == class_index)[0]
         np.random.shuffle(class_indices)
@@ -106,12 +111,13 @@ def few_shot_learning(train_dataset, test_dataset, num_classes, num_shot):
                 query_set_images.append(images[index])
                 query_set_labels.append(labels[index])
 
+    # Convert support set and query set to NumPy arrays for model training
     support_set_images = np.array(support_set_images)
     support_set_labels = np.array(support_set_labels)
     query_set_images = np.array(query_set_images)
     query_set_labels = np.array(query_set_labels)
 
-    # Convert support set and query set labels to one-hot encoding
+    # Binary crossentropy loss requires one-hot encoded labels
     support_set_labels = tf.one_hot(support_set_labels, depth=num_classes)
     query_set_labels = tf.one_hot(query_set_labels, depth=num_classes)
 
