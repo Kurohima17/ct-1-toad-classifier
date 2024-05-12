@@ -6,8 +6,6 @@ import random
 from tensorflow.keras.applications import Xception
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import CategoricalCrossentropy
 
 # Author: Ditiphatra (Hima) Chanarithichai
 # Cereated for: FIT5120 - Industry Experience Project
