@@ -139,7 +139,7 @@ def best_model(train_dataset, test_dataset, num_classes, num_shots):
             best_model = model
 
     # Report best model accuracy
-    print(f'Best model accuracy: {best_accuracy}')
+    print(f'Best model accuracy: {best_accuracy}, best number of shots: {best_num_shot}')
 
     return best_model
 
